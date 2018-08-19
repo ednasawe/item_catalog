@@ -1,5 +1,6 @@
 from flask import Flask, render_template
-from flask import request, redirect, url_for, flash, jsonify
+from flask import request, redirect,
+from flask import url_for, flash, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Book, BookItem
@@ -29,7 +30,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
-# Creating a login session with anti-forgery state token
+# Creating a login session with anti-forgery token
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
@@ -46,7 +47,8 @@ def showLogin():
 def gconnect():
     # Validate state token
     if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response = make_response(json.dumps(
+            'Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     # Obtain authorization code
@@ -54,12 +56,13 @@ def gconnect():
 
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
+        oauth_flow = flow_from_clientsecrets(
+            'client_secret.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(
-            json.dumps('Failed to upgrade the authorization code.'), 401)
+            json.dumps('Failed to upgrade code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -71,7 +74,8 @@ def gconnect():
     result = json.loads(h.request(url, 'GET')[1])
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
-        response = make_response(json.dumps(result.get('error')), 500)
+        response = make_response(json.dumps(result.get(
+            'error')), 500)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -79,14 +83,14 @@ def gconnect():
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
         response = make_response(
-            json.dumps("Token's user ID doesn't match given user ID."), 401)
+            json.dumps("Token ID doesn't match user ID."), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     # Verify that the access token is valid for this app.
     if result['issued_to'] != CLIENT_ID:
         response = make_response(
-            json.dumps("Token's client ID does not match app's."), 401)
+            json.dumps("Token clientID doesn't match appID."), 401)
         print ("Token's client ID does not match app's.")
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -94,8 +98,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user already connected.'),
-                                 200)
+        response = make_response(json.dumps(
+            'Current user already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -134,7 +138,8 @@ def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
         print ('Access Token is None')
-        response = make_response(json.dumps('User not connected.'), 401)
+        response = make_response(json.dumps(
+            'User not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     print ('In gdisconnect access token is %s', access_token)
@@ -152,11 +157,13 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
-        response = make_response(json.dumps('Successfully logged out.'), 200)
+        response = make_response(json.dumps(
+            'Successfully logged out.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token.', 400))
+        response = make_response(json.dumps(
+            'Failed to revoke token.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -234,7 +241,8 @@ def editBookItem(book_id, item_id):
 
 # Creating the  delete route function for the
 # book items
-@app.route('/books/<int:book_id>/<int:item_id>'/delete/', methods=['GET', 'POST'])
+@app.route(
+    '/books/<int:book_id>/<int:item_id>'/delete/, methods=['GET', 'POST'])
 def deleteBookItem(book_id, item_id):
     itemToDelete = session.query(BookItem).filter_by(id=item_id).one()
     if request.method == 'POST':
@@ -244,8 +252,9 @@ def deleteBookItem(book_id, item_id):
         return redirect(url_for('bookItem', book_id=book_id))
     else:
         return render_template('deletebook.html', item=itemToDelete)
-        
-# The function runs the application        
+
+
+# The function runs the application
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
