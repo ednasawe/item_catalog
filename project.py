@@ -1,9 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template
+from flask import request, redirect, url_for, flash, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Book, BookItem
 from flask import session as login_session
-import random, string
+import random
+import string
 
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
@@ -26,6 +28,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
 # Creating a login session with anti-forgery state token
 @app.route('/login')
 def showLogin():
@@ -34,6 +37,7 @@ def showLogin():
     login_session['state'] = state
     # Rendering the login page for user to login first
     return render_template('login.html', STATE=state)
+
 
 # The gconnet function to connect the login page to the
 # books page
@@ -90,7 +94,7 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps('Current user already connected.'),
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -116,7 +120,9 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;"'
+    '"border-radius: 150px;-webkit-border-radius: 150px;"'
+    '"-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print ("done!")
     return output
@@ -128,13 +134,14 @@ def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
         print ('Access Token is None')
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps('User not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     print ('In gdisconnect access token is %s', access_token)
     print ('User name is: ')
     print (login_session['username'])
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s'
+    % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print ('result is ')
@@ -149,11 +156,9 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(json.dumps('Failed to revoke token.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
-
-
 
 
 # Function that calls on a JSON API Endpoint as a GET rEQUEST
@@ -164,6 +169,7 @@ def bookItemJSON(book_id):
         book_id=book_id).all()
     return jsonify(BookItem=[i.serialize for i in items], book=book)
 
+
 # Returning the JSON Endpoints of the books
 # category and the books items
 @app.route('/books/<int:book_id>/item/JSON')
@@ -171,12 +177,14 @@ def bookListItemJSON(book_id, item_id):
     bookItem = session.query(BookItem).filter_by(id=item_id).one()
     return jsonify(BookItem=bookItem.serialize)
 
+
 # The pages that are shown to the users who are not loged in
 # the books categories and the books title, price, and description
 @app.route('/books/JSON')
 def booksJSON():
     books = session.query(Book).all()
     return jsonify(books=[r.serialize for r in books])
+
 
 @app.route('/')
 @app.route('/books/<int:book_id>/')
@@ -186,7 +194,9 @@ def bookItem(book_id):
     return render_template('book.html', book=book, items=items)
 
 # Creating a fucntion that will return the new books in each category
-@app.route('/books/<int:book_id>/new/', methods=['GET','POST'])
+
+
+@app.route('/books/<int:book_id>/new/', methods=['GET', 'POST'])
 def newBookItem(book_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -204,7 +214,7 @@ def newBookItem(book_id):
 # the book item
 @app.route('/books/<int:book_id>/<int:item_id>/edit/', methods=['GET', 'POST'])
 def editBookItem(book_id, item_id):
-    editedItem = session.query(BookItem).filter_by(id = item_id).one()
+    editedItem = session.query(BookItem).filter_by(id=item_id).one()
     if request.method == 'POST':
         if request.form['name']:
             editedItem.name = request.form['name']
@@ -217,12 +227,14 @@ def editBookItem(book_id, item_id):
         flash("A book has been editted")
         return redirect(url_for('bookItem', book_id=book_id))
     else:
-        return render_template('editbookitem.html', book_id=book_id, item_id=item_id, item=editedItem)
+        return render_template
+        ('editbookitem.html', book_id=book_id,
+         item_id=item_id, item=editedItem)
 
 
-# Creating the  delete route function for the 
+# Creating the  delete route function for the
 # book items
-@app.route('/books/<int:book_id>/<int:item_id>/delete/', methods = ['GET', 'POST'])
+@app.route('/books/<int:book_id>/<int:item_id>'/delete/', methods=['GET', 'POST'])
 def deleteBookItem(book_id, item_id):
     itemToDelete = session.query(BookItem).filter_by(id=item_id).one()
     if request.method == 'POST':
@@ -232,9 +244,9 @@ def deleteBookItem(book_id, item_id):
         return redirect(url_for('bookItem', book_id=book_id))
     else:
         return render_template('deletebook.html', item=itemToDelete)
-    
-
+        
+# The function runs the application        
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
-app.run(host='0.0.0.0', port=5000, threaded = False)
+app.run(host='0.0.0.0', port=5000, threaded=False)
