@@ -1,5 +1,7 @@
+#!/usr/bin/python
+import textwrap
 from flask import Flask, render_template
-from flask import request, redirect,
+from flask import request, redirect
 from flask import url_for, flash, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -145,8 +147,8 @@ def gdisconnect():
     print ('In gdisconnect access token is %s', access_token)
     print ('User name is: ')
     print (login_session['username'])
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s'
-    % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s'\
+        % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print ('result is ')
@@ -234,15 +236,15 @@ def editBookItem(book_id, item_id):
         flash("A book has been editted")
         return redirect(url_for('bookItem', book_id=book_id))
     else:
-        return render_template
-        ('editbookitem.html', book_id=book_id,
-         item_id=item_id, item=editedItem)
+        return render_template('editbookitem.html',
+                               book_id=book_id, item_id=item_id,
+                               item=editedItem)
 
 
 # Creating the  delete route function for the
 # book items
-@app.route(
-    '/books/<int:book_id>/<int:item_id>'/delete/, methods=['GET', 'POST'])
+@app.route('/books/<int:book_id>/\
+<int:item_id>/delete/', methods=['GET', 'POST'])
 def deleteBookItem(book_id, item_id):
     itemToDelete = session.query(BookItem).filter_by(id=item_id).one()
     if request.method == 'POST':

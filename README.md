@@ -30,11 +30,11 @@ Install the foloowingsoftwares before you start the project:
 
 * Cd to the directory to /vagrant/item_catalog
 
-* Then run command `python database_setup.py` to create bookitem.db
+* Then run command `python3 database_setup.py` to create bookitem.db
 
-* Then run `python books.py` to populate bookitem.db 
+* Then run `python3 books.py` to populate bookitem.db 
 
-* Run the main application called `projecy.py` to now start the server and open the Books Library website
+* Run the main application called `projecy.py` to now start the server and open the Books Library website using `python3 project.py`
 
 * Open http://localhost:5000 or the port that you have set the project to run on
 
