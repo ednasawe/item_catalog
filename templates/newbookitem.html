@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    </head>
+
+<body>
+
+    <h1>New Book Category</h1>
+
+    <form action="{{url_for('newBookItem', book_id=book_id)}}" method="post">
+
+<dl>
+    <dt>Name:</dt>
+        <dd><input type ='text' size='30' name='name' required></dd>
+    <dt>Description:</dt>
+        <dd><textarea name = 'description' rows='5' cols='40' required></textarea></dd>
+    <dt>Price:</dt>
+        <dd><input type = 'text' size = '8' name='price' required></dd>
+        
+</dl>    
+<input type="text" size="30" name="name">
+<input type="submit" value="Create">
+
+
+</form>
+
+</body>
+
+</html>
