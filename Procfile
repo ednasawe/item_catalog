@@ -1,1 +1,1 @@
-web: python deploy:app
+web: python project.py
