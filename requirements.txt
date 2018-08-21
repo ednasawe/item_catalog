@@ -24,7 +24,6 @@ pyasn1==0.4.4
 pyasn1-modules==0.2.2
 pycrypto==2.6.1
 pycups==1.9.73
-pygobject==3.24.1
 pylint==2.1.1
 python-apt==1.4.0b3
 python-debian==0.1.30
