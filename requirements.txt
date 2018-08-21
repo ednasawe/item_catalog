@@ -38,7 +38,6 @@ SQLAlchemy==1.2.10
 systemd-python==234
 typed-ast==1.1.0
 urllib3==1.21.1
-usb-creator==0.3.3
 vboxapi==1.0
 virtualenv==16.0.0
 virtualenv-clone==0.3.0
