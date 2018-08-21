@@ -260,4 +260,5 @@ def deleteBookItem(book_id, item_id):
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
+    port = int(os.environ.get('PORT', 5000)) 2 3server_address = ('', port)
 app.run(host='0.0.0.0', port=5000, threaded=False)
