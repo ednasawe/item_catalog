@@ -18,12 +18,7 @@ import json
 from flask import make_response
 import requests
 
-from config import Config
-
 app = Flask(__name__)
-app.config.from_object(Config)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = Flask(app)
 
 CLIENT_ID = json.loads(
     open('client_secret.json', 'r').read())['web']['client_id']
@@ -264,11 +259,6 @@ def deleteBookItem(book_id, item_id):
 
 # The function runs the application
 if __name__ == '__main__':
-
-    """In case the postgresql databse created ie empty
-    populate it"""
-    db.create_all()
-
     port = int(os.environ.get('PORT', 33507))
     app.run(
         host='0.0.0.0',
