@@ -175,8 +175,7 @@ def gdisconnect():
 @app.route('/books/<int:book_id>/item/JSON')
 def bookItemJSON(book_id):
     book = session.query(Book).filter_by(id=book_id).one()
-    items = session.query(BookItem).filter_by(
-        book_id=book_id).all()
+    items = session.query(BookItem).filter_by(book_id=book_id).all()
     return jsonify(BookItem=[i.serialize for i in items], book=book)
 
 
