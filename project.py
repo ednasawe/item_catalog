@@ -1,5 +1,4 @@
 #!/usr/bin/python
-import os
 import textwrap
 from flask import Flask, render_template
 from flask import request, redirect
@@ -174,8 +173,9 @@ def gdisconnect():
 # Function that calls on a JSON API Endpoint as a GET rEQUEST
 @app.route('/books/<int:book_id>/item/JSON')
 def bookItemJSON(book_id):
-    book = session.query(Book).all()
-    items = session.query(BookItem).all()
+    book = session.query(Book).filter_by(id=book_id).one()
+    items = session.query(BookItem).filter_by(
+        book_id=book_id).all()
     return jsonify(BookItem=[i.serialize for i in items], book=book)
 
 
@@ -258,8 +258,6 @@ def deleteBookItem(book_id, item_id):
 
 # The function runs the application
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 33507))
-    app.run(
-        host='0.0.0.0',
-        port=port,
-    )
+    app.secret_key = 'super_secret_key'
+    app.debug = True
+app.run(host='0.0.0.0', port=5000, threaded=False)
