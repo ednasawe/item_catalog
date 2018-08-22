@@ -1,1 +1,1 @@
-web: python3 project.py -b :$PORT
+web: gunicorn app.project:app
