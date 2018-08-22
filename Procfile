@@ -1,1 +1,1 @@
-web: python3 project.py
+web: python3 project.py runserver 0.0.0.0:5000
