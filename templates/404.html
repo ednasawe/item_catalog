@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+        
+    </head>
+
+<body>
+    <div class="header__user">
+        {%if 'username' not in session %}
+        <a href="{{url_for('showLogin')}}" class="user__nav">
+            Login
+            </a>
+            {% else %}
+            <a href="{{url_for('logout')}}" class="user__nav">
+                Logout
+                </a>
+                {% endif %}
+    </div>
+    <div>
+            {% extends "book.html" %}
+
+            {% block body %}
+            
+            <p>Sorry, that page does not exist! (404 Error)</p>
+            
+            {% endblocks %}
+
+
+    </div>
+</body>
+</html>
+

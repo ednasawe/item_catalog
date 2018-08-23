@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from database_setup import Book, Base, BookItem
+from database_setup import Book, Base, BookItem, User
 
 engine = create_engine('sqlite:///bookitem.db')
 # Bind the engine to the metadata of the Base class so that the
@@ -35,7 +35,7 @@ bookItem1 = BookItem(name="The Alchemist",
                     "wisdom of listening to our hearts, learning to read the omens"
                     "strewn along life's path, and, above all, following our dreams.",
                      price="$14.50",
-                     book=book1)
+                     books=book1)
 
 session.add(bookItem1)
 session.commit()
@@ -53,7 +53,7 @@ bookItem2 = BookItem(name="Winning",
                      "no b.s. voice, Winning offers deep insights, original thinking, and solutions"
                      "to nuts-and-bolts problems that will change the way people think about work.",
                      price="$18.99",
-                     book=book1)
+                     books=book1)
 
 session.add(bookItem2)
 session.commit()
@@ -73,7 +73,7 @@ bookItem1 = BookItem(name="The Shakespeare Requirement",
                      "anhedonic academe, the Thurber Prize-winning Dear Committee Members."
                      "Once more into the breach...",
                      price="$24.99",
-                     book=book2)
+                     books=book2)
 
 session.add(bookItem1)
 session.commit()
@@ -92,7 +92,7 @@ bookItem2 = BookItem(name="Grind",
                      "reader craving the next twist of fate before it all coalesces in"
                      "one defining moment-a moment that will determine the rest of their lives.",
                      price="$10.59",
-                     book=book2)
+                     books=book2)
 
 session.add(bookItem2)
 session.commit()
@@ -103,7 +103,7 @@ bookItem3 = BookItem(name="The Address",
                      "and ruin, passion and madness, all hidden behind the walls of The"
                      "Dakota New York City most famous residence.",
                      price="15.00",
-                     book=book2)
+                     books=book2)
 
 session.add(bookItem3)
 session.commit()
@@ -127,7 +127,7 @@ bookItem1 = BookItem(name="Business Analytics",
                      "access to commercial grade analytics software gives students real world"
                      "experience and career-focused value.",
                      price="$39.99",
-                     book=book3)
+                     books=book3)
 
 session.add(bookItem1)
 session.commit()
@@ -139,7 +139,7 @@ bookItem2 = BookItem(name="The Outlier Approach: How to Triumph in your Career a
                      "Sell vision to win job interviews, raise money, and recruit superstars"
                      "for your cause. ",
                      price="$15.99",
-                     book=book3)
+                     books=book3)
 
 session.add(bookItem2)
 session.commit()
@@ -159,7 +159,7 @@ bookItem1 = BookItem(name="I will Never Leave You",
                      "the first time, it is no surprise that she falls deeply in love."
                      "There is just one problem: Trish is not the mother.",
                      price="$5.99",
-                     book=book4)
+                     books=book4)
 
 session.add(bookItem1)
 session.commit()
@@ -171,7 +171,7 @@ bookItem2 = BookItem(name="Cyber Storms",
                      "even these questions become unimportant as Mike and his family"
                      "struggle for survival in the wintry tomb of a doomed New York.",
                      price="$5.99",
-                     book=book4)
+                     books=book4)
 
 session.add(bookItem2)
 session.commit()
@@ -190,7 +190,7 @@ bookItem1 = BookItem(name="Single Dad",
                      "weeks to come up with a miracle, or lose everything I have"
                      "worked all my life for.",
                      price="$3.99",
-                     book=book5)
+                     books=book5)
 
 session.add(bookItem1)
 session.commit()
@@ -206,7 +206,7 @@ bookItem2 = BookItem(name="Accidental Rival: An Office Romance",
                      "their lashes back at him. Ugh! What they see in him is"
                      "beyond me.",
                      price="$10.99",
-                     book=book5)
+                     books=book5)
 
 session.add(bookItem2)
 session.commit()
