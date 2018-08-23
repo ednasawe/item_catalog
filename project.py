@@ -4,9 +4,10 @@ import os
 from flask import Flask, render_template
 from flask import request, redirect
 from flask import url_for, flash, jsonify
+from flask import render_template
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Book, BookItem
+from database_setup import Base, Book, BookItem, User
 from flask import session as login_session
 import random
 import string
@@ -25,40 +26,62 @@ CLIENT_ID = json.loads(
 APPLICATION_NAME = "Books Library"
 
 
-# Connecting to the bookitem database
+""" Connecting to the bookitem database"""
 engine = create_engine('sqlite:///bookitem.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+""" Creating the user help function"""
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
 
-# Creating a login session with anti-forgery token
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+
+
+""" Creating a login session with anti-forgery token"""
 @app.route('/login')
 def showLogin():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in range(32))
     login_session['state'] = state
-    # Rendering the login page for user to login first
+    """ Rendering the login page for user to login first"""
     return render_template('login.html', STATE=state)
 
 
-# The gconnet function to connect the login page to the
-# books page
-# Create anti-forgery state token
+""" The gconnet function to connect the login page to the"""
+""" books page"""
+""" Create anti-forgery state token"""
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-    # Validate state token
+    """ Validate state token"""
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps(
             'Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    # Obtain authorization code
+    """ Obtain authorization code"""
     code = request.data
 
     try:
-        # Upgrade the authorization code into a credentials object
+        """ Upgrade the authorization code into a credentials object"""
         oauth_flow = flow_from_clientsecrets(
             'client_secret.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
@@ -69,20 +92,20 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    # Check that the access token is valid.
+    """ Check that the access token is valid."""
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
            % access_token)
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
-    # If there was an error in the access token info, abort.
+    """ If there was an error in the access token info, abort."""
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get(
             'error')), 500)
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    # Verify that the access token is used for the intended user.
+    """ Verify that the access token is used for the intended user."""
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
         response = make_response(
@@ -90,7 +113,7 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    # Verify that the access token is valid for this app.
+    """ Verify that the access token is valid for this app."""
     if result['issued_to'] != CLIENT_ID:
         response = make_response(
             json.dumps("Token clientID doesn't match appID."), 401)
@@ -106,11 +129,11 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-    # Store the access token in the session for later use.
+    """ Store the access token in the session for later use."""
     login_session['access_token'] = credentials.access_token
     login_session['gplus_id'] = gplus_id
 
-    # Get user info
+    """ Get user info"""
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
@@ -121,21 +144,15 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
-    output = ''
-    output += '<h1>Welcome, '
-    output += login_session['username']
-    output += '!</h1>'
-    output += '<img src="'
-    output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;"'
-    '"border-radius: 150px;-webkit-border-radius: 150px;"'
-    '"-moz-border-radius: 150px;"> '
-    flash("you are now logged in as %s" % login_session['username'])
-    print ("done!")
-    return output
+    """ Checks if the user exists already"""
+    user_id = getUserID(data["email"])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+    return "You are Logged in successfully"
 
 
-# gdisconnect function disconnects the user from the webpage
+"""gdisconnect function disconnects the user from the webpage"""
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
@@ -171,7 +188,7 @@ def gdisconnect():
         return response
 
 
-# Function that calls on a JSON API Endpoint as a GET rEQUEST
+""" Function that calls on a JSON API Endpoint as a GET request"""
 @app.route('/books/<int:book_id>/item/JSON')
 def bookItemJSON(book_id):
     book = session.query(Book).filter_by(id=book_id).one()
@@ -180,16 +197,16 @@ def bookItemJSON(book_id):
     return jsonify(BookItem=[i.serialize for i in items], book=book)
 
 
-# Returning the JSON Endpoints of the books
-# category and the books items
+""" Returning the JSON Endpoints of the books"""
+""" category and the books items"""
 @app.route('/books/<int:book_id>/item/JSON')
 def bookListItemJSON(book_id, item_id):
     bookItem = session.query(BookItem).filter_by(id=item_id).one()
     return jsonify(BookItem=bookItem.serialize)
 
 
-# The pages that are shown to the users who are not loged in
-# the books categories and the books title, price, and description
+""" The pages that are shown to the users who are not loged in"""
+""" the books categories and the books title, price, and description"""
 @app.route('/books/JSON')
 def booksJSON():
     books = session.query(Book).all()
@@ -203,9 +220,8 @@ def bookItem(book_id):
     items = session.query(BookItem).filter_by(book_id=book.id)
     return render_template('book.html', book=book, items=items)
 
-# Creating a fucntion that will return the new books in each category
 
-
+""" Creating a fucntion that will return the new books in each category"""
 @app.route('/books/<int:book_id>/new/', methods=['GET', 'POST'])
 def newBookItem(book_id):
     if 'username' not in login_session:
@@ -220,8 +236,8 @@ def newBookItem(book_id):
         return render_template('newbookitem.html', book_id=book_id)
 
 
-# Creatin a function route for editing
-# the book item
+""" Creatin a function route for editing"""
+""" the book item"""
 @app.route('/books/<int:book_id>/<int:item_id>/edit/', methods=['GET', 'POST'])
 def editBookItem(book_id, item_id):
     editedItem = session.query(BookItem).filter_by(id=item_id).one()
@@ -242,8 +258,8 @@ def editBookItem(book_id, item_id):
                                item=editedItem)
 
 
-# Creating the  delete route function for the
-# book items
+""" Creating the  delete route function for the"""
+""" book items"""
 @app.route('/books/<int:book_id>/\
 <int:item_id>/delete/', methods=['GET', 'POST'])
 def deleteBookItem(book_id, item_id):
@@ -257,7 +273,7 @@ def deleteBookItem(book_id, item_id):
         return render_template('deletebook.html', item=itemToDelete)
 
 
-# The function runs the application
+""" The function runs the application"""
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
