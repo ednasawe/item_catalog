@@ -15,7 +15,7 @@ class User(Base):
     name = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False)
     picture = Column(String(250))
-    
+
 
 class Book(Base):
     __tablename__ = 'book'
@@ -41,7 +41,7 @@ class BookItem(Base):
     price = Column(String(8))
     course = Column(String(250))
     book_id = Column(Integer, ForeignKey('book.id'))
-    book = relationship(Book)
+    books = relationship(Book)
 
     @property
     def serialize(self):

@@ -56,11 +56,11 @@ def getUserID(email):
 
 
 @app.route('/')
-@app.route('/catalog')
+@app.route('/books')
 def showBooksCategories():
     """Gets and lists all the books categories"""
     books = session.query(Book).all()
-    return render_template('book.html', books=books, bookItem=bookItem)
+    return render_template('category.html', books=books, bookItem=bookItem)
 
 
 """ Creating a login session with anti-forgery token"""
