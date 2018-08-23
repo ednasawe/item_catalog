@@ -4,13 +4,13 @@ The Books Library application provides a list of books within a variety of categ
 
 ## Prerequisites
 
-Install the foloowingsoftwares before you start the project:
+Install the following software before you start the project:
 
-**Python 3**
+*Python 3*
 
-**Virtual Machine e.g. Oracle VM**
+*Virtual Machine* e.g. Oracle VM
 
-**Vagrant**
+*Vagrant*
 
 ## How To Run
 
@@ -55,7 +55,7 @@ $ git clone {REPOSITORY_CLONE_URL}
 $ cd to the directory
 ```
 
-You can find the link to my project [here]()
+You can find the link to my project [here](https://mybookscatalog.herokuapp.com/)
 
 ### License
 
