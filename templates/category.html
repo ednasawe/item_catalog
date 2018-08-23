@@ -23,7 +23,10 @@
 					<a href="{{url_for('showLogin')}}" class="user__nav">
 						Login
 					</a>
-					
+					{% else %}
+					<a href="{{url_for('logout')}}" class="user__nav">
+						Logout
+					</a>
 					{% endif %}
                 </div>
 			</div>
