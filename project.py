@@ -55,6 +55,13 @@ def getUserID(email):
         return None
 
 
+@app.route('/')
+@app.route('/catalog')
+def showBooksCategories():
+    """Gets and lists all the books categories"""
+    books = session.query(Book).all()
+    return render_template('book.html', books=books, bookItem=bookItem)
+
 
 """ Creating a login session with anti-forgery token"""
 @app.route('/login')
@@ -64,6 +71,20 @@ def showLogin():
     login_session['state'] = state
     """ Rendering the login page for user to login first"""
     return render_template('login.html', STATE=state)
+
+@app.route('/logout')
+def logout():
+    if login_session['provider']=='google':
+        gdisconnect()
+        del login_session['gplus_id']
+        del login_session['access_token']
+
+    del login_session['username']
+    del login_session['email']
+    del login_session['picture']
+    del login_session['user_id']
+
+    return redirect(url_for('showBooksCategories'))
 
 
 """ The gconnet function to connect the login page to the"""
